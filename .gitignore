@@ -1,0 +1,10 @@
+venv/
+.env
+.ruff_cache/
+*.egg-info/
+scratch/
+__pycache__/
+download/
+upload/
+.DS_Store
+redis_data/

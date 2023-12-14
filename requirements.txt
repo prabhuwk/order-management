@@ -1,0 +1,7 @@
+dhanhq==1.2.2
+python-dotenv==1.0.0
+click>=8.1.7
+debugpy==1.8.0
+azure-identity==1.15.0
+azure-keyvault-secrets==4.7.0
+redis==5.0.1

@@ -1,0 +1,26 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - development  # or any branch you want to trigger on
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Login to Azure Container Registry
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+
+    - name: Build and Push Docker image
+      run: |
+        docker build -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/trading-bot/order-management:v1.0 .
+        docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/trading-bot/order-management:v1.0
