@@ -1,3 +1,5 @@
+import json
+import logging
 import os
 
 import redis
@@ -44,5 +46,9 @@ def read_redis_queue(queue_name: str):
     redis_client = get_redis_client()
     message = redis_client.blpop(queue_name, 0)
     if message:
-        return message[1].decode("utf-8")
+        data = message[1].decode("utf-8")
+        try:
+            return json.loads(data)
+        except json.JSONDecodeError as e:
+            logging.error(f"Invalid json data from redis queue. {e}")
     return None

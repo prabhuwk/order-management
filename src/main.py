@@ -1,7 +1,7 @@
-import json
 import time
 
 import click
+from contracts import Contracts
 from utils import read_redis_queue
 
 
@@ -54,13 +54,20 @@ def main(
     environment: str,
     candlestick_interval: int,
 ):
+    symbols_file_path = f"{download_directory}/{symbol_name}-{trade_symbols_file_name}"
     while True:
-        message = read_redis_queue("BUY")
-        try:
-            data = json.loads(message)
-        except json.JSONDecodeError as e:
-            print("error: ", e)
-        print(data)
+        data = read_redis_queue("BUY")
+        if data:
+            spot_price = data.get("close")
+            current_strike_price = round(spot_price / 100) * 100
+            required_strike_price = current_strike_price - 200
+            contracts = Contracts(
+                symbol_name=symbol_name,
+                strike_price=required_strike_price,
+                type="PUT",
+                symbols_file_path=symbols_file_path,
+            )
+            contracts.get()
         time.sleep(1)
 
 
