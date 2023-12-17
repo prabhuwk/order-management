@@ -2,6 +2,7 @@ import time
 
 import click
 from contracts import Contracts
+from strike_price import StrikePrice
 from utils import read_redis_queue
 
 
@@ -59,15 +60,15 @@ def main(
         data = read_redis_queue("BUY")
         if data:
             spot_price = data.get("close")
-            current_strike_price = round(spot_price / 100) * 100
-            required_strike_price = current_strike_price - 200
+            current_strike_price = StrikePrice(symbol_name, spot_price)
+            required_strike_price = current_strike_price.value - 200
             contracts = Contracts(
                 symbol_name=symbol_name,
                 strike_price=required_strike_price,
                 type="PUT",
                 symbols_file_path=symbols_file_path,
             )
-            contracts.get()
+            contracts.details
         time.sleep(1)
 
 

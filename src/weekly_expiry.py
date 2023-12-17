@@ -1,5 +1,6 @@
 import datetime
 from enum import Enum
+from functools import cached_property
 
 
 class ExpiryDays(Enum):
@@ -14,7 +15,7 @@ class WeeklyExpiry:
         self.symbol_name = symbol_name
         self.day_ = ExpiryDays[self.symbol_name].value
 
-    @property
+    @cached_property
     def date_(self) -> datetime:
         current_date = datetime.date.today()
         days_to_add = (self.day_ - current_date.weekday() + 7) % 7
