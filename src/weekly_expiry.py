@@ -4,6 +4,7 @@ from functools import cached_property
 
 
 class ExpiryDays(Enum):
+    MIDCPNIFTY = 0
     FINNIFTY = 1
     BANKNIFTY = 2
     NIFTY = 3

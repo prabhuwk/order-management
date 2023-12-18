@@ -1,9 +1,8 @@
 import time
 
 import click
-from contracts import Contracts
-from strike_price import StrikePrice
-from utils import read_redis_queue
+from order import process_order
+from utils import get_dhan_client, read_redis_queue
 
 
 @click.command()
@@ -55,20 +54,16 @@ def main(
     environment: str,
     candlestick_interval: int,
 ):
+    dhan_client = get_dhan_client(environment=environment)
     symbols_file_path = f"{download_directory}/{symbol_name}-{trade_symbols_file_name}"
+    signals = ["BUY", "SELL"]
     while True:
-        data = read_redis_queue("BUY")
-        if data:
-            spot_price = data.get("close")
-            current_strike_price = StrikePrice(symbol_name, spot_price)
-            required_strike_price = current_strike_price.value - 200
-            contracts = Contracts(
-                symbol_name=symbol_name,
-                strike_price=required_strike_price,
-                type="PUT",
-                symbols_file_path=symbols_file_path,
-            )
-            contracts.details
+        for signal in signals:
+            data = read_redis_queue(signal)
+            if data:
+                process_order(
+                    dhan_client, symbol_name, symbols_file_path, data, signal=signal
+                )
         time.sleep(1)
 
 
