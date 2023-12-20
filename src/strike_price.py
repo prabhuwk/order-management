@@ -1,5 +1,4 @@
 from enum import Enum
-from functools import cached_property
 
 
 class Strike(Enum):
@@ -15,9 +14,10 @@ class StrikePrice:
         self.symbol_name = symbol_name
         self.spot_price = spot_price
         self.option_type = option_type
+        self.current = self._current()
+        self.required = self._required()
 
-    @cached_property
-    def current(self):
+    def _current(self):
         if Strike[self.symbol_name].value == 100:
             return round(self.spot_price / 100) * 100
         if Strike[self.symbol_name].value == 50:
@@ -25,8 +25,7 @@ class StrikePrice:
         if Strike[self.symbol_name].value == 25:
             return round(self.spot_price / 25) * 25
 
-    @cached_property
-    def required(self):
+    def _required(self):
         if Strike[self.symbol_name].value == 100:
             return (
                 self.current - 100 if self.option_type == "PUT" else self.current + 100

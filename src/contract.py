@@ -1,6 +1,5 @@
 import re
 from datetime import datetime
-from functools import cached_property
 
 import pandas as pd
 from option_type import OptionType
@@ -21,20 +20,20 @@ class Contract:
         self.symbols_file_path = symbols_file_path
         self.expiry_day = expiry.date_.day
         self.expiry_month = expiry.date_.strftime("%b").upper()
+        self.name = self._name()
+        self.id = self._id()
 
-    @cached_property
-    def name(self) -> str:
+    def _name(self) -> str:
         return (
             f"{self.symbol_name} {self.expiry_day} "
             f"{self.expiry_month} {self.strike_price} {self.type}"
         )
 
-    @cached_property
-    def id(self):
+    def _id(self) -> str:
         df = pd.read_csv(self.symbols_file_path)
         if self.name in df["SEM_CUSTOM_SYMBOL"].values:
             match = df[df["SEM_CUSTOM_SYMBOL"] == self.name]
-            return match["SEM_SMST_SECURITY_ID"].values[0]
+            return str(match["SEM_SMST_SECURITY_ID"].values[0])
         pattern = re.compile(
             f"{self.symbol_name} ([0-9]+) {self.expiry_month} "
             f"{self.strike_price} {self.type}"
@@ -47,4 +46,4 @@ class Contract:
         future_dates = matched_rows[matched_rows["SEM_EXPIRY_DATE"] > today]
         next_date = future_dates["SEM_EXPIRY_DATE"].min()
         match = future_dates[future_dates["SEM_EXPIRY_DATE"] == next_date]
-        return match["SEM_SMST_SECURITY_ID"].values[0]
+        return str(match["SEM_SMST_SECURITY_ID"].values[0])
