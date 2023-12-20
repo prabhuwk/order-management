@@ -3,7 +3,7 @@ from datetime import datetime
 from functools import cached_property
 
 import pandas as pd
-from weekly_expiry import WeeklyExpiry
+from option_type import OptionType
 
 
 class Contract:
@@ -13,14 +13,14 @@ class Contract:
         strike_price: int,
         type: str,
         symbols_file_path: str,
+        expiry: int,
     ) -> None:
-        self.type = type
+        self.type = OptionType[type].value
         self.strike_price = strike_price
         self.symbol_name = symbol_name
         self.symbols_file_path = symbols_file_path
-        self.expiry = WeeklyExpiry(self.symbol_name)
-        self.expiry_day = self.expiry.date_.day
-        self.expiry_month = self.expiry.date_.strftime("%b").upper()
+        self.expiry_day = expiry.date_.day
+        self.expiry_month = expiry.date_.strftime("%b").upper()
 
     @cached_property
     def name(self) -> str:
@@ -30,7 +30,7 @@ class Contract:
         )
 
     @cached_property
-    def id_(self):
+    def id(self):
         df = pd.read_csv(self.symbols_file_path)
         if self.name in df["SEM_CUSTOM_SYMBOL"].values:
             match = df[df["SEM_CUSTOM_SYMBOL"] == self.name]

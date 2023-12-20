@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from enum import Enum
 
 
@@ -9,29 +10,89 @@ class LotSize(Enum):
     SENSEX = 10
 
 
+@dataclass(frozen=True)
+class OrderInfo:
+    id: str
+    status: str
+
+
 class Order:
     def __init__(self, dhan_client):
         self.dhan_client = dhan_client
 
+    @property
     def list(self):
         order_list = self.dhan_client.get_order_list()
         if order_list.get("status") == "success":
-            return order_list.data
+            return order_list.get("data")
         return None
 
     def get(self, order_id: int):
         return self.dhan_client.get_order_by_id(order_id=order_id)
 
-    def place(self, security_id: str, transaction_type: str, quantity: int):
-        return self.dhan_client.place_order(
+    def sell(self, security_id: str, quantity: int) -> OrderInfo:
+        sell_order = self.dhan_client.place_order(
             security_id=security_id,
             exchange_segment=self.dhan_client.FNO,
-            transaction_type=self.dhan_client[transaction_type],
+            transaction_type=self.dhan_client.SELL,
             quantity=quantity,
             order_type=self.dhan_client.MARKET,
             product_type=self.dhan_client.INTRA,
             price=0,
         )
+        if sell_order.get("status") == "success":
+            return OrderInfo(
+                id=sell_order.get("data").get("orderId"),
+                status=sell_order.get("data").get("orderStatus"),
+            )
+
+    def buy(self, security_id: str, quantity: int) -> OrderInfo:
+        buy_order = self.dhan_client.place_order(
+            security_id=security_id,
+            exchange_segment=self.dhan_client.FNO,
+            transaction_type=self.dhan_client.BUY,
+            quantity=quantity,
+            order_type=self.dhan_client.MARKET,
+            product_type=self.dhan_client.INTRA,
+            price=0,
+        )
+        if buy_order.get("status") == "success":
+            return OrderInfo(
+                id=buy_order.get("data").get("orderId"),
+                status=buy_order.get("data").get("orderStatus"),
+            )
+
+    def limit(self, security_id: str, quantity: int) -> OrderInfo:
+        limit_order = self.dhan_client.place_order(
+            security_id=security_id,
+            exchange_segment=self.dhan_client.FNO,
+            transaction_type=self.dhan_client.LIMIT,
+            quantity=quantity,
+            order_type=self.dhan_client.MARKET,
+            product_type=self.dhan_client.INTRA,
+            price=0,
+        )
+        if limit_order.get("status") == "success":
+            return OrderInfo(
+                id=limit_order.get("data").get("orderId"),
+                status=limit_order.get("data").get("orderStatus"),
+            )
+
+    def stop_limit(self, security_id: str, quantity: int) -> OrderInfo:
+        stop_limit_order = self.dhan_client.place_order(
+            security_id=security_id,
+            exchange_segment=self.dhan_client.FNO,
+            transaction_type=self.dhan_client.STOP_LIMIT,
+            quantity=quantity,
+            order_type=self.dhan_client.MARKET,
+            product_type=self.dhan_client.INTRA,
+            price=0,
+        )
+        if stop_limit_order.get("status") == "success":
+            return OrderInfo(
+                id=stop_limit_order.get("data").get("orderId"),
+                status=stop_limit_order.get("data").get("orderStatus"),
+            )
 
     def modify(
         self,
@@ -57,13 +118,3 @@ class Order:
 
     def cancel(self, order_id: int):
         return self.dhan_client.cancel_order(order_id=order_id)
-
-    def exists(self, security_id: str, transaction_type: str) -> bool:
-        orders = self.list()
-        for order in orders:
-            if (
-                order.get("securityId") == security_id
-                and order.get("transactionType") == transaction_type
-            ):
-                return True
-        return False
