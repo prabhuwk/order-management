@@ -1,4 +1,5 @@
 import logging
+import re
 import time
 
 import click
@@ -43,7 +44,7 @@ def main(
         for signal in signals:
             data = read_redis_queue(signal)
             if data:
-                spot_price = data.get("close")
+                spot_price = data.get("close") if signal == "BUY" else data.get("open")
                 strike_price = StrikePrice(
                     symbol_name, spot_price, option_type=OptionType[signal].value
                 )
@@ -56,13 +57,23 @@ def main(
                     expiry=expiry,
                 )
                 order = Order(dhan_client=dhan_client)
-                if order.list:
+                order_list = order.list
+                if order_list:
+                    for single_order in order_list:
+                        pattern = re.compile("(\w+)-\w+-\d+-\w+")
+                        match = re.match(pattern, single_order.get("tradingSymbol"))
+                        if match.groups()[0] == symbol_name:
+                            logger.info(
+                                f"{single_order.get('transactionType')} order already "
+                                f"exists for {symbol_name}"
+                            )
+                            continue
                     continue
                 sell_order = order.sell(
                     security_id=contract.id,
                     quantity=LotSize[symbol_name].value,
                 )
-                logger.info(sell_order.id)
+                logger.info(f"SELL order {sell_order.id} executed for {contract.name}")
 
         time.sleep(1)
 
