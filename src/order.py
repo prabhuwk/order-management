@@ -1,5 +1,8 @@
 from dataclasses import dataclass
 from enum import Enum
+from typing import Dict, List, Literal
+
+from dhanhq import dhanhq
 
 
 class LotSize(Enum):
@@ -13,21 +16,21 @@ class LotSize(Enum):
 @dataclass(frozen=True)
 class OrderInfo:
     id: str
-    status: str
+    status: Literal["TRANSIT", "PENDING", "REJECTED", "CANCELLED", "TRADED", "EXPIRED"]
 
 
 class Order:
-    def __init__(self, dhan_client):
+    def __init__(self, dhan_client: dhanhq):
         self.dhan_client = dhan_client
 
     @property
-    def list(self):
+    def list(self) -> List:
         order_list = self.dhan_client.get_order_list()
         if order_list.get("status") == "success":
             return order_list.get("data")
         return None
 
-    def get(self, order_id: int):
+    def get(self, order_id: int) -> Dict:
         get_order = self.dhan_client.get_order_by_id(order_id=order_id)
         if get_order.get("status") == "success":
             return get_order.get("data")
@@ -99,14 +102,14 @@ class Order:
 
     def modify(
         self,
-        order_id,
+        order_id: str,
         order_type,
-        leg_name,
-        quantity,
-        price,
-        trigger_price,
-        disclosed_quantity,
-        validity,
+        leg_name: str,
+        quantity: int,
+        price: float,
+        trigger_price: float,
+        disclosed_quantity: int,
+        validity: str,
     ):
         return self.dhan_client.modify_order(
             order_id,

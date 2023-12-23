@@ -21,7 +21,7 @@ class Contract:
         self.expiry_day = expiry.date_.day
         self.expiry_month = expiry.date_.strftime("%b").upper()
         self.name = self._name()
-        self.id = self._id()
+        self.security_id = self._security_id()
 
     def _name(self) -> str:
         return (
@@ -29,7 +29,7 @@ class Contract:
             f"{self.expiry_month} {self.strike_price} {self.type}"
         )
 
-    def _id(self) -> str:
+    def _security_id(self) -> str:
         df = pd.read_csv(self.symbols_file_path)
         if self.name in df["SEM_CUSTOM_SYMBOL"].values:
             match = df[df["SEM_CUSTOM_SYMBOL"] == self.name]
