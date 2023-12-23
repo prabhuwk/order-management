@@ -28,7 +28,10 @@ class Order:
         return None
 
     def get(self, order_id: int):
-        return self.dhan_client.get_order_by_id(order_id=order_id)
+        get_order = self.dhan_client.get_order_by_id(order_id=order_id)
+        if get_order.get("status") == "success":
+            return get_order.get("data")
+        return None
 
     def sell(self, security_id: str, quantity: int) -> OrderInfo:
         sell_order = self.dhan_client.place_order(

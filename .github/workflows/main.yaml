@@ -22,5 +22,5 @@ jobs:
 
     - name: Build and Push Docker image
       run: |
-        docker build -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/trading-bot/order-management:v1.0 .
-        docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/trading-bot/order-management:v1.0
+        docker build -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/trading-bot/order-management:v1.1 .
+        docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/trading-bot/order-management:v1.1

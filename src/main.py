@@ -1,20 +1,15 @@
-import logging
 import re
-import time
 
 import click
 from contract import Contract
+from minute_chart import MinuteChart
 from option_type import OptionType
 from order import LotSize, Order
+from process_order import process_order
 from strike_price import StrikePrice
+from symbol_id import SymbolId
 from utils import get_dhan_client, read_redis_queue
 from weekly_expiry import WeeklyExpiry
-
-logging.basicConfig(
-    level=logging.INFO,
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
-logger = logging.getLogger(__name__)
 
 
 @click.command()
@@ -63,7 +58,7 @@ def main(
                         pattern = re.compile("(\w+)-\w+-\d+-\w+")
                         match = re.match(pattern, single_order.get("tradingSymbol"))
                         if match.groups()[0] == symbol_name:
-                            logger.info(
+                            click.secho(
                                 f"{single_order.get('transactionType')} order already "
                                 f"exists for {symbol_name}"
                             )
@@ -73,9 +68,17 @@ def main(
                     security_id=contract.id,
                     quantity=LotSize[symbol_name].value,
                 )
-                logger.info(f"SELL order {sell_order.id} executed for {contract.name}")
-
-        time.sleep(1)
+                click.secho(f"SELL order {sell_order.id} executed for {contract.name}")
+                minute_chart = MinuteChart(dhan_client=dhan_client)
+                process_order(
+                    minute_chart,
+                    order,
+                    symbol_id=SymbolId[symbol_name].value,
+                    contract_id=contract.id,
+                    ordered_candle=data,
+                    quantity=LotSize[symbol_name].value,
+                    signal=signal,
+                )
 
 
 if __name__ == "__main__":
