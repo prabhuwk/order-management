@@ -43,7 +43,7 @@ class Order:
             transaction_type=self.dhan_client.SELL,
             quantity=quantity,
             order_type=self.dhan_client.MARKET,
-            product_type=self.dhan_client.INTRA,
+            product_type=self.dhan_client.MARGIN,
             price=0,
         )
         if sell_order.get("status") == "success":
@@ -59,45 +59,13 @@ class Order:
             transaction_type=self.dhan_client.BUY,
             quantity=quantity,
             order_type=self.dhan_client.MARKET,
-            product_type=self.dhan_client.INTRA,
+            product_type=self.dhan_client.MARGIN,
             price=0,
         )
         if buy_order.get("status") == "success":
             return OrderInfo(
                 id=buy_order.get("data").get("orderId"),
                 status=buy_order.get("data").get("orderStatus"),
-            )
-
-    def limit(self, security_id: str, quantity: int) -> OrderInfo:
-        limit_order = self.dhan_client.place_order(
-            security_id=security_id,
-            exchange_segment=self.dhan_client.FNO,
-            transaction_type=self.dhan_client.LIMIT,
-            quantity=quantity,
-            order_type=self.dhan_client.MARKET,
-            product_type=self.dhan_client.INTRA,
-            price=0,
-        )
-        if limit_order.get("status") == "success":
-            return OrderInfo(
-                id=limit_order.get("data").get("orderId"),
-                status=limit_order.get("data").get("orderStatus"),
-            )
-
-    def stop_limit(self, security_id: str, quantity: int) -> OrderInfo:
-        stop_limit_order = self.dhan_client.place_order(
-            security_id=security_id,
-            exchange_segment=self.dhan_client.FNO,
-            transaction_type=self.dhan_client.STOP_LIMIT,
-            quantity=quantity,
-            order_type=self.dhan_client.MARKET,
-            product_type=self.dhan_client.INTRA,
-            price=0,
-        )
-        if stop_limit_order.get("status") == "success":
-            return OrderInfo(
-                id=stop_limit_order.get("data").get("orderId"),
-                status=stop_limit_order.get("data").get("orderStatus"),
             )
 
     def modify(

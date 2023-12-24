@@ -1,4 +1,5 @@
 import time
+from datetime import datetime
 from typing import Literal
 
 from minute_chart import MinuteChart
@@ -30,6 +31,11 @@ def process_order(
             ordered_candle=ordered_candle,
             percent=target_percent,
         )
-        if stop_loss.hit or target.hit:
+        current_time = datetime.now()
+        if (
+            stop_loss.hit
+            or target.hit
+            or (current_time.hour == 15 and current_time.minute == 28)
+        ):
             return order.buy(security_id=security_id, quantity=quantity)
         time.sleep(60)
