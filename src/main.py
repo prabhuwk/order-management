@@ -59,9 +59,7 @@ def main(
             after_current_minute = current_time + timedelta(minutes=1)
             if not before_current_minute < candle_data_timestamp < after_current_minute:
                 continue
-            spot_price = (
-                candle_data.get("close") if signal == "BUY" else candle_data.get("open")
-            )
+            spot_price = candle_data.get("close")
             strike_price = StrikePrice(
                 symbol_name, spot_price, option_type=OptionType[signal].value
             )
