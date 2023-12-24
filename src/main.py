@@ -1,4 +1,5 @@
 import time
+from datetime import datetime, timedelta
 
 import click
 from contract import Contract
@@ -49,6 +50,14 @@ def main(
         for signal in signals:
             candle_data = read_redis_queue(signal)
             if not candle_data:
+                continue
+            candle_data_timestamp = datetime.strptime(
+                candle_data["timestamp"], "%Y-%m-%d %H:%M:%S"
+            )
+            current_time = datetime.now()
+            before_current_minute = current_time - timedelta(minutes=1)
+            after_current_minute = current_time + timedelta(minutes=1)
+            if not before_current_minute < candle_data_timestamp < after_current_minute:
                 continue
             spot_price = (
                 candle_data.get("close") if signal == "BUY" else candle_data.get("open")
