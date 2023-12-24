@@ -7,17 +7,20 @@ class StopLoss(ABC):
         self.current_candle = current_candle
         self.ordered_candle = ordered_candle
 
+    @property
     @abstractmethod
     def hit(self):
         pass
 
 
 class BuyStopLoss(StopLoss):
+    @property
     def hit(self) -> bool:
         return self.current_candle["low"][-1] < self.ordered_candle["low"]
 
 
 class SellStopLoss(StopLoss):
+    @property
     def hit(self) -> bool:
         return self.current_candle["high"][-1] > self.ordered_candle["high"]
 

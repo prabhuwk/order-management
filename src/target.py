@@ -17,6 +17,7 @@ class Target(ABC):
     def price(self):
         pass
 
+    @property
     @abstractmethod
     def hit(self):
         pass
@@ -29,6 +30,7 @@ class BuyTarget(Target):
             * (self.percent / 100)
         )
 
+    @property
     def hit(self) -> bool:
         return self.current_candle["high"][-1] > self.price()
 
@@ -40,6 +42,7 @@ class SellTarget(Target):
             * ((100 - self.percent) / 100)
         )
 
+    @property
     def hit(self) -> bool:
         return self.current_candle["low"][-1] > self.price()
 
