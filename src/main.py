@@ -88,12 +88,14 @@ def main(
             process_order(
                 minute_chart=minute_chart,
                 order=order,
-                symbol_id=SymbolId[symbol_name].value,
-                security_id=contract.security_id,
+                symbol_security_id=SymbolId[symbol_name].value,
+                contract_security_id=contract.security_id,
                 ordered_candle=candle_data,
                 quantity=LotSize[symbol_name].value,
                 signal=signal,
                 target_percent=target_percent,
+                positions=positions,
+                position_type=position_type,
             )
         time.sleep(0.5)
 
