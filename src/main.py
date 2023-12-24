@@ -47,10 +47,12 @@ def main(
     signals = ["BUY", "SELL"]
     while True:
         for signal in signals:
-            data = read_redis_queue(signal)
-            if not data:
+            candle_data = read_redis_queue(signal)
+            if not candle_data:
                 continue
-            spot_price = data.get("close") if signal == "BUY" else data.get("open")
+            spot_price = (
+                candle_data.get("close") if signal == "BUY" else candle_data.get("open")
+            )
             strike_price = StrikePrice(
                 symbol_name, spot_price, option_type=OptionType[signal].value
             )
@@ -79,7 +81,7 @@ def main(
                 order=order,
                 symbol_id=SymbolId[symbol_name].value,
                 security_id=contract.security_id,
-                ordered_candle=data,
+                ordered_candle=candle_data,
                 quantity=LotSize[symbol_name].value,
                 signal=signal,
                 target_percent=target_percent,
