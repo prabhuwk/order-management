@@ -20,6 +20,7 @@ def process_order(
     target_percent: int,
     positions: Positions,
     position_type: Literal["SHORT", "LONG", "CLOSED"],
+    symbol_name: str,
 ):
     while True:
         current_candle = minute_chart.intraday(security_id=symbol_security_id)
@@ -27,6 +28,7 @@ def process_order(
             signal=signal,
             current_candle=current_candle,
             ordered_candle=ordered_candle,
+            symbol_name=symbol_name,
         )
         target = TargetFactory.get_target(
             signal=signal,

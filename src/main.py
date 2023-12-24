@@ -94,6 +94,7 @@ def main(
                 target_percent=target_percent,
                 positions=positions,
                 position_type=position_type,
+                symbol_name=symbol_name,
             )
         time.sleep(0.5)
 
