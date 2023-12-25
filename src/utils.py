@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from functools import lru_cache
 
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
@@ -35,6 +36,7 @@ def get_dhan_client(environment: str) -> dhanhq:
     return dhanhq(client_id, access_token)
 
 
+@lru_cache
 def get_redis_client() -> Redis:
     host = os.environ.get("REDIS_HOST")
     port = os.environ.get("REDIS_PORT")
@@ -44,7 +46,7 @@ def get_redis_client() -> Redis:
 
 def read_redis_queue(queue_name: str) -> dict:
     redis_client = get_redis_client()
-    message = redis_client.blpop(queue_name, 0)
+    message = redis_client.blpop(queue_name, 1)
     if message:
         data = message[1].decode("utf-8")
         try:
