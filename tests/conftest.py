@@ -44,6 +44,7 @@ def mock_positions_output() -> dict:
             {
                 "positionType": "SHORT",
                 "securityId": "52428",
+                "tradingSymbol": "MIDCPNIFTY-Dec2023-10325-CE",
             }
         ],
         "remarks": "",
