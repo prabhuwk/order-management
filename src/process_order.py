@@ -42,7 +42,9 @@ def process_order(
             or target.hit
             or (current_time.hour == 15 and current_time.minute == 28)
         ):
-            if positions.exists(symbol_name=symbol_name, position_type=position_type):
+            if positions.strike_exists(
+                security_id=contract_security_id, position_type=position_type
+            ):
                 return order.buy(security_id=contract_security_id, quantity=quantity)
             return
         time.sleep(60)
