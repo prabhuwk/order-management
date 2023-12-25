@@ -72,9 +72,7 @@ def main(
                 expiry=expiry,
             )
             positions = Positions(dhan_client=dhan_client)
-            if positions.exists(
-                security_id=contract.security_id, position_type=position_type
-            ):
+            if positions.exists(symbol_name=symbol_name, position_type=position_type):
                 continue
             order = Order(dhan_client=dhan_client)
             sell_order = order.sell(

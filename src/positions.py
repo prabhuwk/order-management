@@ -14,13 +14,12 @@ class Positions:
 
     def exists(
         self,
-        security_id: LiteralString,
+        symbol_name: LiteralString,
         position_type: Literal["SHORT", "LONG", "CLOSED"],
     ) -> bool:
         for position in self.get:
-            if (
-                position.get("securityId") == security_id
-                and position.get("positionType") == position_type
-            ):
-                return True
+            if position.get("positionType") == position_type:
+                trading_symbol = position.get("tradingSymbol").split("-")[0]
+                if trading_symbol == symbol_name:
+                    return True
         return False
