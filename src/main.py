@@ -55,8 +55,8 @@ def main(
                 candle_data["timestamp"], "%Y-%m-%d %H:%M:%S"
             )
             current_time = datetime.now()
-            before_current_minute = current_time - timedelta(minutes=1)
-            after_current_minute = current_time + timedelta(minutes=1)
+            before_current_minute = current_time - timedelta(minutes=2)
+            after_current_minute = current_time + timedelta(minutes=2)
             if not before_current_minute < candle_data_timestamp < after_current_minute:
                 continue
             spot_price = candle_data.get("close")
