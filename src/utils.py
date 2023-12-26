@@ -46,7 +46,7 @@ def get_redis_client() -> Redis:
 
 def read_redis_queue() -> dict:
     redis_client = get_redis_client()
-    item = redis_client.blpop(["BUY", "SELL"], 1)
+    item = redis_client.blpop(["BUY", "SELL"], 30)
     if not item:
         return None, None
     queue_name, message = item
