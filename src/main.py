@@ -1,3 +1,4 @@
+import time
 from datetime import datetime, timedelta
 
 import click
@@ -91,6 +92,7 @@ def main(
             position_type=position_type,
             symbol_name=symbol_name,
         )
+        time.sleep(0.5)
 
 
 if __name__ == "__main__":
