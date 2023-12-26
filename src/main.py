@@ -1,5 +1,5 @@
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import click
 from contract import Contract
@@ -49,13 +49,16 @@ def main(
         signal, candle_data = read_redis_queue()
         if not candle_data:
             continue
+        signal = signal.decode("utf-8")
         candle_data_timestamp = datetime.strptime(
             candle_data["timestamp"], "%Y-%m-%d %H:%M:%S"
         )
         current_time = datetime.now()
-        before_current_minute = current_time - timedelta(minutes=1)
-        after_current_minute = current_time + timedelta(minutes=1)
-        if not before_current_minute < candle_data_timestamp < after_current_minute:
+        if not (
+            current_time.day == candle_data_timestamp.day
+            and current_time.hour == candle_data_timestamp.hour
+            and current_time.minute == candle_data_timestamp.minute
+        ):
             continue
         spot_price = candle_data.get("close")
         strike_price = StrikePrice(
