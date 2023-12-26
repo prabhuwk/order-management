@@ -44,13 +44,15 @@ def get_redis_client() -> Redis:
     return Redis(host=host, port=port, db=db)
 
 
-def read_redis_queue(queue_name: str) -> dict:
+def read_redis_queue() -> dict:
     redis_client = get_redis_client()
-    message = redis_client.blpop(queue_name, 1)
+    item = redis_client.blpop(["BUY", "SELL"], 1)
+    if not item:
+        return None, None
+    queue_name, message = item
     if message:
-        data = message[1].decode("utf-8")
         try:
-            return json.loads(data)
+            return queue_name, json.loads(message)
         except json.JSONDecodeError as e:
             logging.error(f"Invalid json data from redis queue. {e}")
-    return None
+    return None, None
