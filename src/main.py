@@ -1,7 +1,9 @@
 import logging
+import os
 from datetime import datetime
 
 import click
+import debugpy
 from contract import Contract
 from minute_chart import MinuteChart
 from option_type import OptionType
@@ -18,6 +20,11 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
+
+
+if os.environ.get("DEBUG") == "True":
+    debugpy.listen(5678)
+    debugpy.wait_for_client()
 
 
 @click.command()
