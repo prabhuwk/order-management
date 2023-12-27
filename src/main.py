@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 
 if os.environ.get("DEBUG") == "True":
-    debugpy.listen(5678)
+    debugpy.listen(("0.0.0.0", 5678))
     debugpy.wait_for_client()
 
 
