@@ -1,4 +1,4 @@
-import time
+import logging
 from datetime import datetime
 
 import click
@@ -12,6 +12,12 @@ from strike_price import StrikePrice
 from symbol_id import SymbolId
 from utils import get_dhan_client, read_redis_queue
 from weekly_expiry import WeeklyExpiry
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 
 @click.command()
@@ -50,19 +56,32 @@ def main(
         if not candle_data:
             continue
         signal = signal.decode("utf-8")
+        logger.info(f"signal is {signal}")
         candle_data_timestamp = datetime.strptime(
             candle_data["timestamp"], "%Y-%m-%d %H:%M:%S"
         )
         current_time = datetime.now()
+        logger.info(f"current time is {current_time}")
         if not (
             current_time.day == candle_data_timestamp.day
             and current_time.hour == candle_data_timestamp.hour
             and current_time.minute == candle_data_timestamp.minute
         ):
+            logger.info(
+                "SKIPPING as current timestamp and candle timestamp are not matching\n"
+                f"current_time {current_time}\n"
+                f"candlestick time {candle_data_timestamp}\n"
+                f"candlestick data {candle_data}"
+            )
             continue
         spot_price = candle_data.get("close")
+        logger.info(f"spot_price is {spot_price}")
         strike_price = StrikePrice(
             symbol_name, spot_price, option_type=OptionType[signal].value
+        )
+        logger.info(
+            f"current strike_price {strike_price.current}\n"
+            f"required strike_price {strike_price.required}"
         )
         expiry = WeeklyExpiry(symbol_name)
         contract = Contract(
@@ -74,13 +93,17 @@ def main(
         )
         positions = Positions(dhan_client=dhan_client)
         if positions.spot_exists(symbol_name=symbol_name, position_type=position_type):
+            logger.info(
+                f"position already exists for contract {contract.name} "
+                f"and security_id {contract.security_id}"
+            )
             continue
         order = Order(dhan_client=dhan_client)
         sell_order = order.sell(
             security_id=contract.security_id,
             quantity=LotSize[symbol_name].value,
         )
-        click.secho(f"SELL order {sell_order.id} executed for {contract.name}")
+        logger.info(f"SELL order {sell_order.id} executed for {contract.name}")
         minute_chart = MinuteChart(dhan_client=dhan_client)
         process_order(
             minute_chart=minute_chart,
@@ -95,7 +118,6 @@ def main(
             position_type=position_type,
             symbol_name=symbol_name,
         )
-        time.sleep(0.5)
 
 
 if __name__ == "__main__":

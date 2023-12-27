@@ -1,3 +1,4 @@
+import logging
 import time
 from datetime import datetime
 from typing import Literal
@@ -7,6 +8,12 @@ from order import Order
 from positions import Positions
 from stop_loss import StopLossFactory
 from target import TargetFactory
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 
 def process_order(
@@ -23,6 +30,7 @@ def process_order(
     symbol_name: str,
 ):
     while True:
+        logger.info("getting every minute candlestick data")
         current_candle = minute_chart.intraday(security_id=symbol_security_id)
         stop_loss = StopLossFactory.get_stop_loss(
             signal=signal,
@@ -45,6 +53,7 @@ def process_order(
             if positions.strike_exists(
                 security_id=contract_security_id, position_type=position_type
             ):
+                logger.info(f"closing existing position for {contract_security_id}")
                 return order.buy(security_id=contract_security_id, quantity=quantity)
             return
         time.sleep(60)

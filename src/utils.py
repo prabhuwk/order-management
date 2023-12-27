@@ -9,6 +9,12 @@ from dhanhq import dhanhq
 from dotenv import load_dotenv
 from redis import Redis
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
+
 
 class ClientIdAccessTokenNotFoundError(Exception):
     """Client ID and Access Token not found"""
@@ -46,12 +52,13 @@ def get_redis_client() -> Redis:
 
 def read_redis_queue() -> dict:
     redis_client = get_redis_client()
-    item = redis_client.blpop(["BUY", "SELL"], 10)
+    item = redis_client.blpop(["BUY", "SELL"], 5)
     if not item:
         return None, None
     queue_name, message = item
     if message:
         try:
+            logger.info(f"found data in redis queue {queue_name}")
             return queue_name, json.loads(message)
         except json.JSONDecodeError as e:
             logging.error(f"Invalid json data from redis queue. {e}")
