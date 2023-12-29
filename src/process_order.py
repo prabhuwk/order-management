@@ -8,6 +8,7 @@ from order import Order
 from positions import Positions
 from stop_loss import StopLossFactory
 from target import TargetFactory
+from trading_hours import TradingHours
 
 logging.basicConfig(
     level=logging.INFO,
@@ -28,6 +29,7 @@ def process_order(
     positions: Positions,
     position_type: Literal["SHORT", "LONG", "CLOSED"],
     symbol_name: str,
+    trading_hours: TradingHours,
 ):
     while True:
         logger.info("getting every minute candlestick data")
@@ -50,7 +52,7 @@ def process_order(
             or target.hit
             or (current_time.hour == 15 and current_time.minute == 28)
         ):
-            if positions.strike_exists(
+            if trading_hours.close_position and positions.strike_exists(
                 security_id=contract_security_id, position_type=position_type
             ):
                 logger.info(f"closing existing position for {contract_security_id}")

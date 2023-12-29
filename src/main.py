@@ -12,6 +12,7 @@ from positions import Positions
 from process_order import process_order
 from strike_price import StrikePrice
 from symbol_id import SymbolId
+from trading_hours import TradingHours
 from utils import get_dhan_client, read_redis_queue
 from weekly_expiry import WeeklyExpiry
 
@@ -58,6 +59,7 @@ def main(
 ):
     dhan_client = get_dhan_client(environment=environment)
     symbols_file_path = f"{download_directory}/{symbol_name}-{trade_symbols_file_name}"
+    trading_hours = TradingHours()
     while True:
         signal, candle_data = read_redis_queue()
         if not candle_data:
@@ -105,6 +107,8 @@ def main(
                 f"and security_id {contract.security_id}"
             )
             continue
+        if not trading_hours.open_position:
+            continue
         order = Order(dhan_client=dhan_client)
         sell_order = order.sell(
             security_id=contract.security_id,
@@ -124,6 +128,7 @@ def main(
             positions=positions,
             position_type=position_type,
             symbol_name=symbol_name,
+            trading_hours=trading_hours,
         )
 
 
