@@ -60,6 +60,15 @@ def main(
     dhan_client = get_dhan_client(environment=environment)
     symbols_file_path = f"{download_directory}/{symbol_name}-{trade_symbols_file_name}"
     trading_hours = TradingHours()
+    positions = Positions(dhan_client=dhan_client)
+    order = Order(dhan_client=dhan_client)
+    if positions.spot_exists(symbol_name=symbol_name, position_type=position_type):
+        logger.info("Open position exists even after reboot. closing it.")
+        for position in positions.get:
+            if position.get("positionType") == position_type:
+                contract_security_id = position.get("securityId")
+                quantity = position.get("sellQty")
+                order.buy(security_id=contract_security_id, quantity=quantity)
     while True:
         signal, candle_data = read_redis_queue()
         if not candle_data:
@@ -109,7 +118,6 @@ def main(
             continue
         if not trading_hours.open_position:
             continue
-        order = Order(dhan_client=dhan_client)
         sell_order = order.sell(
             security_id=contract.security_id,
             quantity=LotSize[symbol_name].value,
