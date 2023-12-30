@@ -4,6 +4,7 @@ from datetime import datetime
 
 import click
 import debugpy
+import pandas as pd
 from contract import Contract
 from minute_chart import MinuteChart
 from option_type import OptionType
@@ -69,6 +70,7 @@ def main(
                 contract_security_id = position.get("securityId")
                 quantity = position.get("sellQty")
                 order.buy(security_id=contract_security_id, quantity=quantity)
+    contract_df = pd.read_csv(symbols_file_path)
     while True:
         signal, candle_data = read_redis_queue()
         if not candle_data:
@@ -106,10 +108,9 @@ def main(
             symbol_name=symbol_name,
             strike_price=strike_price.required,
             type=signal,
-            symbols_file_path=symbols_file_path,
+            contract_df=contract_df,
             expiry=expiry,
         )
-        positions = Positions(dhan_client=dhan_client)
         if positions.spot_exists(symbol_name=symbol_name, position_type=position_type):
             logger.info(
                 f"position already exists for contract {contract.name} "
