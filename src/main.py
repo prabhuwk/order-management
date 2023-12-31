@@ -88,10 +88,9 @@ def main(
             and current_time.minute == candle_data_timestamp.minute
         ):
             logger.info(
-                "SKIPPING as current timestamp and candle timestamp are not matching\n"
+                "SKIPPING current timestamp and candle timestamp are not matching\n"
                 f"current_time {current_time}\n"
                 f"candlestick time {candle_data_timestamp}\n"
-                f"candlestick data {candle_data}"
             )
             continue
         spot_price = candle_data.get("close")
@@ -113,17 +112,18 @@ def main(
         )
         if positions.spot_exists(symbol_name=symbol_name, position_type=position_type):
             logger.info(
-                f"position already exists for contract {contract.name} "
+                f"SKIPPING position already exists for contract {contract.name} "
                 f"and security_id {contract.security_id}"
             )
             continue
         if not trading_hours.open_position:
+            logger.info("SKIPPING non position open hour")
             continue
         sell_order = order.sell(
             security_id=contract.security_id,
             quantity=LotSize[symbol_name].value,
         )
-        logger.info(f"SELL order {sell_order.id} executed for {contract.name}")
+        logger.info(f"RUNNING sell order {sell_order.id} executed for {contract.name}")
         minute_chart = MinuteChart(dhan_client=dhan_client)
         process_order(
             minute_chart=minute_chart,

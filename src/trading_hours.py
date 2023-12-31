@@ -5,7 +5,7 @@ from enum import Enum
 
 class OpenPosition(Enum):
     START_TIME = time(9, 15)
-    END_TIME = time(15, 14)
+    END_TIME = time(15, 0)
 
 
 class ClosePosition(Enum):
