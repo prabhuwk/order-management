@@ -24,7 +24,7 @@ class TradingHours:
         self.close_position = self._close_position()
 
     def _weekday(self):
-        return self._time.weekday() >= 5
+        return self._time.weekday() < 5
 
     def _open_position(self):
         return (
