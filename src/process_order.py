@@ -32,7 +32,6 @@ def process_order(
     trading_hours: TradingHours,
 ):
     while True:
-        logger.info("RUNNING every minute candlestick data")
         current_candle = minute_chart.intraday(security_id=symbol_security_id)
         stop_loss = StopLossFactory.get_stop_loss(
             signal=signal,
@@ -55,8 +54,9 @@ def process_order(
             if trading_hours.close_position and positions.strike_exists(
                 security_id=contract_security_id, position_type=position_type
             ):
-                logger.info(f"closing existing position for {contract_security_id}")
+                logger.info(
+                    f"stop loss hit is {stop_loss.hit} and target hit is {target.hit}"
+                )
                 return order.buy(security_id=contract_security_id, quantity=quantity)
             return
-        logger.info(f"stop loss hit is {stop_loss.hit} and target hit is {target.hit}")
         time.sleep(60)
