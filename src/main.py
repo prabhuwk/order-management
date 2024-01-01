@@ -1,6 +1,6 @@
 import logging
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import click
 import debugpy
@@ -81,15 +81,17 @@ def main(
             candle_data["timestamp"], "%Y-%m-%d %H:%M:%S"
         )
         current_time = datetime.now()
+        previous_candle_time = current_time - timedelta(minutes=5)
         logger.info(f"current time is {current_time}")
+        logger.info(f"previous candle time is {previous_candle_time}")
         if not (
-            current_time.day == candle_data_timestamp.day
-            and current_time.hour == candle_data_timestamp.hour
-            and current_time.minute == candle_data_timestamp.minute
+            previous_candle_time.day == candle_data_timestamp.day
+            and previous_candle_time.hour == candle_data_timestamp.hour
+            and previous_candle_time.minute == candle_data_timestamp.minute
         ):
             logger.info(
-                "SKIPPING current timestamp and candle timestamp are not matching\n"
-                f"current_time {current_time}\n"
+                "SKIPPING as previous candle timestamp is not matching\n"
+                f"previous_candle_time {previous_candle_time}\n"
                 f"candlestick time {candle_data_timestamp}\n"
             )
             continue
