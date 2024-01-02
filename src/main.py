@@ -141,6 +141,7 @@ def main(
             symbol_name=symbol_name,
             trading_hours=trading_hours,
         )
+        logger.info("next line after process_order function")
 
 
 if __name__ == "__main__":

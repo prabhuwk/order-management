@@ -32,6 +32,7 @@ def process_order(
     trading_hours: TradingHours,
 ):
     while True:
+        logger.info("get every minute candlestick data to check stop loss and target")
         current_candle = minute_chart.intraday(security_id=symbol_security_id)
         stop_loss = StopLossFactory.get_stop_loss(
             signal=signal,
@@ -46,6 +47,7 @@ def process_order(
             percent=target_percent,
         )
         current_time = datetime.now()
+        logger.info(f"stop loss hit is {stop_loss.hit} and target hit is {target.hit}")
         if (
             stop_loss.hit
             or target.hit
@@ -58,5 +60,6 @@ def process_order(
                     f"stop loss hit is {stop_loss.hit} and target hit is {target.hit}"
                 )
                 return order.buy(security_id=contract_security_id, quantity=quantity)
+            logger.info("returning back to process_order_function")
             return
         time.sleep(60)
