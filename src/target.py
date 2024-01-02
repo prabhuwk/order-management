@@ -44,7 +44,7 @@ class SellTarget(Target):
 
     @property
     def hit(self) -> bool:
-        return self.current_candle["low"][-1] > self.price()
+        return self.current_candle["low"][-1] < self.price()
 
 
 class TargetFactory:
