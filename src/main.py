@@ -66,9 +66,11 @@ def main(
     if positions.spot_exists(symbol_name=symbol_name, position_type=position_type):
         logger.info("Open position exists even after reboot. closing it.")
         for position in positions.get:
-            if position.get("positionType") == position_type:
+            if position.get("positionType") == "SHORT":
                 contract_security_id = position.get("securityId")
                 quantity = position.get("sellQty")
+                trading_symbol = position.get("tradingSymbol")
+                logger.info(f"closing position for {trading_symbol}")
                 order.buy(security_id=contract_security_id, quantity=quantity)
     contract_df = pd.read_csv(symbols_file_path)
     while True:
