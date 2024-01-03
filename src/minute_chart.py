@@ -15,4 +15,6 @@ class MinuteChart:
             exchange_segment=self._exchange_segment,
             instrument_type=self._instrument_type,
         )
+        if minute_chart["status"] == "failure":
+            return None
         return minute_chart["data"]

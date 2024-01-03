@@ -35,6 +35,8 @@ def process_order(
         time.sleep(60)
         logger.info("get every minute candlestick data to check stop loss and target")
         current_candle = minute_chart.intraday(security_id=symbol_security_id)
+        if not current_candle:
+            continue
         stop_loss = StopLossFactory.get_stop_loss(
             signal=signal,
             current_candle=current_candle,
